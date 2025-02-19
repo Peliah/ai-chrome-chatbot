@@ -137,7 +137,12 @@ export default function Home() {
       });
       await translator.ready;
     }
-    console.log(await translator.translate(text));
+    if (availability === 'readily') {
+      const newText = await translator.translate(text);
+
+      console.log(newText);
+
+    }
 
     return await translator.translate(text);
   };
