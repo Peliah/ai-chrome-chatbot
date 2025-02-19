@@ -233,6 +233,8 @@ export default function Home() {
       toast.success('Language detected successfully');
 
       const translatedText = await translateText(message.text, targetLanguage, detectedLanguage);
+      console.log(translatedText);
+
       updateMessage(messageId, { translation: { text: translatedText, language: targetLanguage } });
 
       toast.success('Text translated successfully');
