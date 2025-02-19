@@ -7,7 +7,7 @@ import { MessageInput } from '@/components/chat/message-input';
 import { MessageSquare } from 'lucide-react';
 import { useChatStore } from '@/lib/store';
 import { toast } from 'sonner';
-
+import { ScrollArea } from '@/components/ui/scroll-area';
 declare global {
   interface Window {
     ai: any;
@@ -16,17 +16,6 @@ declare global {
 
 export default function Home() {
   const { messages, isProcessing, addMessage, updateMessage, setIsProcessing } = useChatStore();
-
-  // const detectLanguage = async (text: string) => {
-  //   const response = await fetch('/api/detect-language', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({ text }),
-  //   });
-  //   if (!response.ok) throw new Error('Failed to detect language');
-  //   const data = await response.json();
-  //   return data.language;
-  // };
 
   const detectLanguage = async (text: string) => {
     const languageDetectorCapabilities = await self.ai.languageDetector.capabilities();
@@ -48,17 +37,6 @@ export default function Home() {
     const detectedLanguage = await detector.detect(text);
     return detectedLanguage[0].detectedLanguage;
   };
-
-  // const summarizeText = async (text: string) => {
-  //   const response = await fetch('/api/summarize', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({ text }),
-  //   });
-  //   if (!response.ok) throw new Error('Failed to summarize text');
-
-  //   return response.body; // Return the ReadableStream
-  // };
 
 
   let summarizer: any = null;
@@ -92,18 +70,17 @@ export default function Home() {
       context: 'This article is intended for a tech-savvy audience.',
     });
 
-    // Create a ReadableStream to pass data incrementally
     return new ReadableStream({
       async start(controller) {
         let previousLength = 0;
 
         for await (const segment of stream) {
           const newContent = segment.slice(previousLength);
-          controller.enqueue(new TextEncoder().encode(newContent)); // Send chunk
+          controller.enqueue(new TextEncoder().encode(newContent));
           previousLength = segment.length;
         }
 
-        controller.close(); // Close stream when done
+        controller.close();
       },
     });
   };
@@ -116,17 +93,10 @@ export default function Home() {
 
     if (availability === 'no') {
       toast.error('Translator is unavailable');
-      // return null;
-    }
-
-    let translator = await self.ai.translator.create({
-      sourceLanguage: sourceLanguage,
-      targetLanguage,
-    });
-
-    if (availability === 'after-download') {
+      return null;
+    } else if (availability === 'after-download') {
       toast.message('Downloading target language "' + targetLanguage + '"')
-      translator = await self.ai.translator.create({
+      let translator = await self.ai.translator.create({
         sourceLanguage: 'es',
         targetLanguage: 'fr',
         monitor(m: { addEventListener: (arg0: string, arg1: (e: any) => void) => void; }) {
@@ -137,14 +107,20 @@ export default function Home() {
       });
       await translator.ready;
     }
+    let newText;
     if (availability === 'readily') {
-      const newText = await translator.translate(text);
+      console.log('hello');
 
-      console.log(newText);
+      let translator = await self.ai.translator.create({
+        sourceLanguage: sourceLanguage,
+        targetLanguage,
+      });
+      console.log(translator);
+      newText = await translator.translate(text);
 
     }
 
-    return await translator.translate(text);
+    return newText;
   };
 
   const handleSendMessage = async (text: string) => {
@@ -201,31 +177,6 @@ export default function Home() {
       console.error('Error summarizing message:', error);
     }
   };
-
-  // const handleTranslate = async (messageId: string, targetLanguage: string) => {
-  //   const message = messages.find((m) => m.id === messageId);
-  //   if (!message) return;
-  //   try {
-  //     const detectedLanguage = await detectLanguage(message.text);
-  //     updateMessage(messageId, { detectedLanguage });
-  //     toast.success('Message sent and language detected');
-  //   } catch (error) {
-  //     toast.error('Failed to process message');
-  //     console.error('Error processing message:', error);
-  //   } finally {
-  //     setIsProcessing(false);
-  //   }
-
-  //   try {
-  //     // updateMessage(messageId, { translation: { text: '', language: targetLanguage } });
-  //     const stream = await translateText(message.text, targetLanguage, sourceLanguage);
-  //     updateMessage(messageId, { translation: { text: stream, language: targetLanguage } });
-  //     toast.success('Text translated successfully');
-  //   } catch (error) {
-  //     toast.error('Failed to translate text');
-  //     console.error('Error translating message:', error);
-  //   }
-  // };
 
   const handleTranslate = async (messageId: string, targetLanguage: string) => {
     const message = messages.find((m) => m.id === messageId);
