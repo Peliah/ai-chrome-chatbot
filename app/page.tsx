@@ -108,10 +108,11 @@ export default function Home() {
     });
   };
 
-  const translateText = async (text: string, targetLanguage: string) => {
-    const sourceLanguage = await detectLanguage(text);
+  const translateText = async (text: string, targetLanguage: string, sourceLanguage: string) => {
     const translatorCapabilities = await self.ai.translator.capabilities();
     const availability = translatorCapabilities.languagePairAvailable(sourceLanguage, targetLanguage);
+    console.log(availability);
+    console.log(sourceLanguage, ' ', targetLanguage);
 
     if (availability === 'no') {
       toast.error('Translator is unavailable');
@@ -195,20 +196,54 @@ export default function Home() {
     }
   };
 
+  // const handleTranslate = async (messageId: string, targetLanguage: string) => {
+  //   const message = messages.find((m) => m.id === messageId);
+  //   if (!message) return;
+  //   try {
+  //     const detectedLanguage = await detectLanguage(message.text);
+  //     updateMessage(messageId, { detectedLanguage });
+  //     toast.success('Message sent and language detected');
+  //   } catch (error) {
+  //     toast.error('Failed to process message');
+  //     console.error('Error processing message:', error);
+  //   } finally {
+  //     setIsProcessing(false);
+  //   }
+
+  //   try {
+  //     // updateMessage(messageId, { translation: { text: '', language: targetLanguage } });
+  //     const stream = await translateText(message.text, targetLanguage, sourceLanguage);
+  //     updateMessage(messageId, { translation: { text: stream, language: targetLanguage } });
+  //     toast.success('Text translated successfully');
+  //   } catch (error) {
+  //     toast.error('Failed to translate text');
+  //     console.error('Error translating message:', error);
+  //   }
+  // };
+
   const handleTranslate = async (messageId: string, targetLanguage: string) => {
     const message = messages.find((m) => m.id === messageId);
     if (!message) return;
 
+    setIsProcessing(true);
+
     try {
-      updateMessage(messageId, { translation: { text: '', language: targetLanguage } });
-      const stream = await translateText(message.text, targetLanguage);
-      updateMessage(messageId, { translation: { text: stream, language: targetLanguage } });
+      const detectedLanguage = await detectLanguage(message.text);
+      updateMessage(messageId, { detectedLanguage });
+      toast.success('Language detected successfully');
+
+      const translatedText = await translateText(message.text, targetLanguage, detectedLanguage);
+      updateMessage(messageId, { translation: { text: translatedText, language: targetLanguage } });
+
       toast.success('Text translated successfully');
     } catch (error) {
-      toast.error('Failed to translate text');
+      toast.error('Failed to translate message');
       console.error('Error translating message:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
+
 
 
   return (
