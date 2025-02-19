@@ -137,6 +137,7 @@ export default function Home() {
       });
       await translator.ready;
     }
+    console.log(await translator.translate(text));
 
     return await translator.translate(text);
   };
