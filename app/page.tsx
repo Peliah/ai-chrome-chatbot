@@ -1,6 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+
+declare global {
+  interface Window {
+    ai: any;
+  }
+}
 import { v4 as uuidv4 } from 'uuid';
 import { Message, ChatState } from './types';
 import { MessageList } from '@/components/chat/message-list';
@@ -35,7 +41,7 @@ export default function Home() {
       detector = await self.ai.languageDetector.create();
     } else {
       detector = await self.ai.languageDetector.create();
-      detector.addEventListener("downloadprogress", (e) => {
+      detector.addEventListener("downloadprogress", (e: { loaded: any; total: any; }) => {
         console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
       });
       await detector.ready;
@@ -116,7 +122,7 @@ export default function Home() {
 
     summarizer = await self.ai.summarizer.create(options);
     if (available !== 'readily') {
-      summarizer.addEventListener('downloadprogress', (e) => {
+      summarizer.addEventListener('downloadprogress', (e: { loaded: any; total: any; }) => {
         console.log(`Downloaded: ${e.loaded} / ${e.total}`);
       });
       await summarizer.ready;
