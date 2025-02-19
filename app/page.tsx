@@ -115,7 +115,7 @@ export default function Home() {
 
     if (availability === 'no') {
       toast.error('Translator is unavailable');
-      return null;
+      // return null;
     }
 
     let translator = await self.ai.translator.create({
