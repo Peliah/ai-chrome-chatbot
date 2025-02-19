@@ -13,14 +13,36 @@ export default function Home() {
     isProcessing: false,
   });
 
+  // const detectLanguage = async (text: string) => {
+  //   // const response = await fetch('/api/detect-language', {
+  //   //   method: 'POST',
+  //   //   headers: { 'Content-Type': 'application/json' },
+  //   //   body: JSON.stringify({ text }),
+  //   // });
+  //   // const data = await response.json();
+  //   // return data.language;
+
+
+  // };
   const detectLanguage = async (text: string) => {
-    const response = await fetch('/api/detect-language', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
-    });
-    const data = await response.json();
-    return data.language;
+    const languageDetectorCapabilities = await self.ai.languageDetector.capabilities();
+    const canDetect = languageDetectorCapabilities.available; // Fix: Correct property
+
+    let detector;
+    if (canDetect === "no") return null; // No detection possible
+
+    if (canDetect === "readily") {
+      detector = await self.ai.languageDetector.create();
+    } else {
+      detector = await self.ai.languageDetector.create();
+      detector.addEventListener("downloadprogress", (e) => {
+        console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
+      });
+      await detector.ready;
+    }
+
+    const detectedLanguage = await detector.detect(text); // ✅ Now it actually detects!
+    return detectedLanguage[0].detectedLanguage;
   };
 
   // const summarizeText = async (text: string) => {
@@ -156,13 +178,11 @@ export default function Home() {
       setChatState((prev) => ({
         ...prev,
         messages: prev.messages.map((msg) =>
-          msg.id === messageId
-            ? { ...msg, detectedLanguage }
-            : msg
+          msg.id === messageId ? { ...msg, detectedLanguage } : msg
         ),
       }));
     } catch (error) {
-      console.error('Error processing message:', error);
+      console.error("Error processing message:", error);
     } finally {
       setChatState((prev) => ({
         ...prev,
