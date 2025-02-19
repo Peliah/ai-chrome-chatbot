@@ -72,14 +72,20 @@ export default function Home() {
     };
 
     const available = (await self.ai.summarizer.capabilities()).available;
-    if (available === 'no') return null;
+    if (available === 'no') {
+      toast.error('Summarizer is unavailable');
+      return null;
+    }
 
     summarizer = await self.ai.summarizer.create(options);
+    toast.error('Summarizer is downloading');
     if (available !== 'readily') {
       summarizer.addEventListener('downloadprogress', (e: { loaded: any; total: any; }) => {
         console.log(`Downloaded: ${e.loaded} / ${e.total}`);
       });
       await summarizer.ready;
+      toast.success('Summarizer has finished downloading');
+
     }
 
     const stream = await summarizer.summarizeStreaming(text, {
@@ -107,7 +113,10 @@ export default function Home() {
     const translatorCapabilities = await self.ai.translator.capabilities();
     const availability = translatorCapabilities.languagePairAvailable(sourceLanguage, targetLanguage);
 
-    if (availability === 'no') return null;
+    if (availability === 'no') {
+      toast.error('Translator is unavailable');
+      return null;
+    }
 
     let translator = await self.ai.translator.create({
       sourceLanguage: sourceLanguage,
