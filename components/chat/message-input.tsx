@@ -30,17 +30,26 @@ export function MessageInput({ onSend, isProcessing }: MessageInputProps) {
           placeholder="Type your message..."
           className="min-h-[80px] neo-brutalism bg-white resize-none"
           disabled={isProcessing}
+          aria-label="Message input"
+          aria-required="true"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
         />
         <Button 
           type="submit" 
           size="icon" 
           disabled={!message.trim() || isProcessing}
           className="neo-brutalism bg-secondary hover:bg-secondary/90 text-white"
+          aria-label={isProcessing ? "Sending message..." : "Send message"}
         >
           {isProcessing ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
           ) : (
-            <SendHorizontal className="h-4 w-4" />
+            <SendHorizontal className="h-4 w-4" aria-hidden="true" />
           )}
         </Button>
       </div>

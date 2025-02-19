@@ -37,7 +37,11 @@ export function MessageItem({ message, onSummarize, onTranslate }: MessageItemPr
   };
 
   return (
-    <div className={`flex flex-col ${message.sender === 'user' ? 'items-end' : 'items-start'} mb-6`}>
+    <div 
+      className={`flex flex-col ${message.sender === 'user' ? 'items-end' : 'items-start'} mb-6`}
+      role="listitem"
+      aria-label={`${message.sender === 'user' ? 'Your message' : 'AI response'}`}
+    >
       <div
         className={`max-w-[80%] p-4 ${
           message.sender === 'user'
@@ -47,18 +51,18 @@ export function MessageItem({ message, onSummarize, onTranslate }: MessageItemPr
       >
         <p className="whitespace-pre-wrap font-medium">{message.text}</p>
         {message.detectedLanguage && (
-          <p className="text-sm mt-2 font-bold">
+          <p className="text-sm mt-2 font-bold" role="status">
             Detected Language: {message.detectedLanguage}
           </p>
         )}
         {message.summary && (
-          <div className="mt-2 p-2 bg-white/90 neo-brutalism border-2">
+          <div className="mt-2 p-2 bg-white/90 neo-brutalism border-2" role="region" aria-label="Summary">
             <p className="text-sm font-black text-black">Summary:</p>
             <p className="text-sm font-medium text-black">{message.summary}</p>
           </div>
         )}
         {message.translation && (
-          <div className="mt-2 p-2 bg-white/90 neo-brutalism border-2">
+          <div className="mt-2 p-2 bg-white/90 neo-brutalism border-2" role="region" aria-label="Translation">
             <p className="text-sm font-black text-black">
               Translation ({message.translation.language}):
             </p>
@@ -74,15 +78,20 @@ export function MessageItem({ message, onSummarize, onTranslate }: MessageItemPr
             onClick={handleSummarize}
             disabled={isSummarizing}
             className="neo-brutalism bg-white hover:bg-white/90"
+            aria-label="Summarize message"
+            aria-busy={isSummarizing}
           >
-            {isSummarizing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isSummarizing && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
             Summarize
           </Button>
         </div>
       )}
       {message.sender === 'user' && (
         <div className="mt-2 flex gap-2">
-          <Select onValueChange={setSelectedLanguage}>
+          <Select 
+            onValueChange={setSelectedLanguage}
+            aria-label="Select target language"
+          >
             <SelectTrigger className="w-[120px] neo-brutalism bg-white">
               <SelectValue placeholder="Translate to" />
             </SelectTrigger>
@@ -101,8 +110,10 @@ export function MessageItem({ message, onSummarize, onTranslate }: MessageItemPr
             onClick={handleTranslate}
             disabled={!selectedLanguage || isTranslating}
             className="neo-brutalism bg-white hover:bg-white/90"
+            aria-label="Translate message"
+            aria-busy={isTranslating}
           >
-            {isTranslating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isTranslating && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
             Translate
           </Button>
         </div>
