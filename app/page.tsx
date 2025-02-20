@@ -17,6 +17,11 @@ declare global {
 export default function Home() {
   const { messages, isProcessing, addMessage, updateMessage, setIsProcessing } = useChatStore();
 
+  /**
+ * Detects the language of the given text using the AI language detector.
+ * @param {string} text - The text to detect the language of.
+ * @returns {Promise<string | null>} - The detected language or null if detection is not possible.
+ */
   const detectLanguage = async (text: string) => {
     const languageDetectorCapabilities = await self.ai.languageDetector.capabilities();
     const canDetect = languageDetectorCapabilities.available;
@@ -41,6 +46,11 @@ export default function Home() {
 
   let summarizer: any = null;
 
+  /**
+ * Summarizes the given text using the AI summarizer.
+ * @param {string} text - The text to summarize.
+ * @returns {Promise<ReadableStream | null>} - A readable stream of the summarized text or null if summarization is not possible.
+ */
   const summarizeText = async (text: string) => {
     const options = {
       sharedContext: 'This is a project document',
@@ -85,6 +95,13 @@ export default function Home() {
     });
   };
 
+  /**
+ * Translates the given text from the source language to the target language using the AI translator.
+ * @param {string} text - The text to translate.
+ * @param {string} targetLanguage - The target language to translate the text into.
+ * @param {string} sourceLanguage - The source language of the text.
+ * @returns {Promise<string | null>} - The translated text or null if translation is not possible.
+ */
   const translateText = async (text: string, targetLanguage: string, sourceLanguage: string) => {
     const translatorCapabilities = await self.ai.translator.capabilities();
     const availability = translatorCapabilities.languagePairAvailable(sourceLanguage, targetLanguage);
@@ -123,6 +140,10 @@ export default function Home() {
     return newText;
   };
 
+  /**
+ * Handles sending a message by detecting its language and adding it to the message list.
+ * @param {string} text - The text of the message to send.
+ */
   const handleSendMessage = async (text: string) => {
     setIsProcessing(true);
     const messageId = uuidv4();
@@ -148,6 +169,10 @@ export default function Home() {
     }
   };
 
+  /**
+ * Handles summarizing a message by updating its summary field with the summarized text.
+ * @param {string} messageId - The ID of the message to summarize.
+ */
   const handleSummarize = async (messageId: string) => {
     const message = messages.find((m) => m.id === messageId);
     if (!message) return;
@@ -178,6 +203,11 @@ export default function Home() {
     }
   };
 
+  /**
+ * Handles translating a message by updating its translation field with the translated text.
+ * @param {string} messageId - The ID of the message to translate.
+ * @param {string} targetLanguage - The target language to translate the message into.
+ */
   const handleTranslate = async (messageId: string, targetLanguage: string) => {
     const message = messages.find((m) => m.id === messageId);
     if (!message) return;
@@ -211,16 +241,19 @@ export default function Home() {
       <header className="neo-brutalism bg-primary mb-4 p-4" role="banner">
         <div className="flex items-center gap-2">
           <MessageSquare className="h-8 w-8" aria-hidden="true" />
-          <h1 className="text-2xl font-black">AI Chat Assistant</h1>
+          <h1 className="text-2xl font-black">Peliah AI Chat Assistant</h1>
         </div>
       </header>
-      <main className="flex-1 neo-brutalism bg-white mb-4" role="main">
-        <MessageList
-          messages={messages}
-          onSummarize={handleSummarize}
-          onTranslate={handleTranslate}
-        />
-      </main>
+      <ScrollArea className='flex-1 neo-brutalism bg-white mb-4 p-2'>
+        <main className="" role="main">
+          <MessageList
+            messages={messages}
+            onSummarize={handleSummarize}
+            onTranslate={handleTranslate}
+          />
+
+        </main>
+      </ScrollArea>
       <footer className="neo-brutalism bg-white" role="contentinfo">
         <MessageInput onSend={handleSendMessage} isProcessing={isProcessing} />
       </footer>
