@@ -22,9 +22,8 @@ const images = [
 export default function LandingPage() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
-            {/* Header */}
             <header className="text-center mb-8">
-                <h1 className="text-6xl font-black  neo-brutalism bg-primary ">
+                <h1 className="text-4xl md:text-6xl font-black  neo-brutalism bg-primary ">
                     Peliah&apos;s AI Chat Assistant
                 </h1>
                 <p className="text-xl  mt-4">
