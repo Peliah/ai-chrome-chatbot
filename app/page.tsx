@@ -36,7 +36,7 @@ export default function LandingPage() {
                     modules={[Autoplay]}
                     spaceBetween={30}
                     slidesPerView={1}
-                    autoplay={{ delay: 3000 }}
+                    autoplay={{ delay: 1500 }}
                     loop
                 >
                     {images.map((src, index) => (
@@ -45,9 +45,9 @@ export default function LandingPage() {
                                 <Image
                                     src={src}
                                     alt={`Chat Illustration ${index + 1}`}
-                                    layout="fill"
-                                    objectFit="contain"
-                                    className="rounded-lg"
+                                    fill
+                                    style={{ objectFit: "contain" }}
+                                    className=""
                                 />
                             </div>
                         </SwiperSlide>

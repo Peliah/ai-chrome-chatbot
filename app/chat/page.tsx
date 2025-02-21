@@ -125,17 +125,17 @@ export default function Home() {
       await translator.ready;
     }
     let newText;
-    if (availability === 'readily') {
+    // if (availability === 'readily') {
       console.log('hello');
 
       let translator = await self.ai.translator.create({
         sourceLanguage: sourceLanguage,
         targetLanguage,
       });
-      console.log(translator);
       newText = await translator.translate(text);
+      console.log(newText);
 
-    }
+    // }
 
     return newText;
   };
